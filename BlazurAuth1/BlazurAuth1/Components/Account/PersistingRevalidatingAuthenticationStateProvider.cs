@@ -96,7 +96,7 @@ namespace BlazurAuth1.Components.Account
                     {
                         UserId = userId,
                         Email = email,
-                        Role = role
+                        Role = role ?? "User"
                     });
                 }
             }
