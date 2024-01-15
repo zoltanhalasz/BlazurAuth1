@@ -59,22 +59,21 @@
     {
         user = await UserAccessor.GetRequiredUserAsync(HttpContext);
         username = await UserManager.GetUserNameAsync(user);
-        phoneNumber = await UserManager.GetPhoneNumberAsync(user);        
+        phoneNumber = await UserManager.GetPhoneNumberAsync(user);
 
         Input.PhoneNumber ??= phoneNumber;
         Input.BirthDay ??= user.DateOfBirth;
-             Input.SiteUrl ??= user.SiteUrl;
+        Input.SiteUrl ??= user.SiteUrl;
     }
 
     private async Task OnValidSubmitAsync()
     {
-        if (Input.PhoneNumber != phoneNumber)
+        user.DateOfBirth ??= Input.BirthDay;
+        user.SiteUrl ??= Input.SiteUrl;
+        var result = await UserManager.UpdateAsync(user);
+        if (!result.Succeeded)
         {
-            var setPhoneResult = await UserManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-            if (!setPhoneResult.Succeeded)
-            {
-                RedirectManager.RedirectToCurrentPageWithStatus("Error: Failed to set phone number.", HttpContext);
-            }
+            RedirectManager.RedirectToCurrentPageWithStatus("Error: Failed to update user data.", HttpContext);
         }
 
         await SignInManager.RefreshSignInAsync(user);
@@ -86,11 +85,11 @@
         [Phone]
         [Display(Name = "Phone number")]
         public string? PhoneNumber { get; set; }
-              
+
         [Display(Name = "Birth Date")]
         public DateOnly? BirthDay { get; set; }
 
         [Display(Name = "Site Url")]
-        public string? SiteUrl{ get; set; }
+        public string? SiteUrl { get; set; }
     }
 }
